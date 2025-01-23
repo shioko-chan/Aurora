@@ -1,5 +1,24 @@
 @import 'tailwindcss';
 
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* dark */
+  --color-aurora: #77ffcc;
+  --color-aurora-background: #1b263b;
+  --color-aurora-highlight: #f3ff88;
+  --color-aurora-text: #e0fbfc;
+  --color-aurora-textdark: #050102;
+  --color-aurora-supplement: #9f7eff;
+  /* light */
+  --color-desert: #d4a373;
+  --color-desert-background: #f8e8d4;
+  --color-desert-highlight: #ffb400;
+  --color-desert-text: #4e342e;
+  --color-desert-textlight: #8d6e63;
+  --color-desert-supplement: #a1887f;
+}
+
 html,
 body,
 #app {

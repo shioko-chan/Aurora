@@ -1,16 +1,18 @@
 <script setup lang="ts">
+
 import { computed, ref } from 'vue';
+
 import ResizingPanel from './components/ResizingPanel.vue';
+import LiteDialog from './components/LiteDialog.vue';
 
 const window_id = ref(0);
 const windows = ref([{
   id: 0,
   name: 'QuasarTraj',
   panels: [
-    { id: 0, title: '视频流-原图', x: 100, y: 100, width: 300, height: 200, type: 'video_stream' },
-    { id: 1, title: '视频流-检测框', x: 400, y: 100, width: 300, height: 200, type: 'video_stream' },
+    { id: 0, title: '视频流-原图', x: 100, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
+    { id: 1, title: '视频流-检测框', x: 400, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
     { id: 2, title: '参数调整-', x: 100, y: 400, width: 300, height: 200 },
-    // { id: 3, title: '', x: 400, y: 400, width: 300, height: 200 },
   ]
 }, {
   id: 1,
@@ -58,31 +60,13 @@ const form = ref({
   name: 'name here',
   region: 'region here',
 });
+
+const dialog_open = ref(true);
+const dialog_title = ref('Dialog Title');
 </script>
 
 <template>
-  <el-dialog v-model="new_panel_dialog_visible" title="新建面板" width="500">
-    <el-form :model="form">
-      <el-form-item label="Promotion name" label-width="100px">
-        <el-input v-model="form.name" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="Zones" label-width="100px">
-        <el-select v-model="form.region" placeholder="Please select a zone">
-          <el-option label="Zone No.1" value="shanghai" />
-          <el-option label="Zone No.2" value="beijing" />
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="new_panel_dialog_visible = false">Cancel</el-button>
-        <el-button type="primary" @click="new_panel_dialog_visible = false">
-          Confirm
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
-
+  <LiteDialog v-model:is-open="dialog_open" v-model:title="dialog_title" @confirm="1"></LiteDialog>
   <header class="bg-desert-background text-desert-text dark:bg-aurora-background dark:text-aurora-text p-4 flex justify-between items-center
     border-b border-desert dark:border-aurora">
     <h1 class="text-xl font-bold">{{ current_window.name }}</h1>
