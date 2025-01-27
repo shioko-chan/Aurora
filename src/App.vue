@@ -5,14 +5,13 @@ import { computed, ref } from 'vue';
 import ResizingPanel from './components/ResizingPanel.vue';
 import LiteDialog from './components/LiteDialog.vue';
 
-const window_id = ref(0);
 const windows = ref([{
   id: 0,
   name: 'QuasarTraj',
   panels: [
     { id: 0, title: '视频流-原图', x: 100, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
     { id: 1, title: '视频流-检测框', x: 400, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
-    { id: 2, title: '参数调整-', x: 100, y: 400, width: 300, height: 200 },
+    { id: 2, title: '参数-相机参数', x: 100, y: 400, width: 300, height: 200 },
   ]
 }, {
   id: 1,
@@ -34,11 +33,7 @@ const windows = ref([{
   ]
 }]);
 
-const dropdown_open = ref(false);
-
-function toggle_dropdown() {
-  dropdown_open.value = !dropdown_open.value;
-}
+const window_select_dropdown_open = ref(false);
 
 const dark_mode = ref(true);
 
@@ -47,51 +42,96 @@ function toggle_dark_mode() {
   document.documentElement.classList.toggle('dark', dark_mode.value);
 }
 
-const current_window = computed(() => {
-  return windows.value[window_id.value];
-});
+const window_id = ref(0);
 
 function change_window(id: number) {
   window_id.value = id;
 }
 
-const new_panel_dialog_visible = ref(true);
-const form = ref({
-  name: 'name here',
-  region: 'region here',
+const current_window = computed(() => {
+  return windows.value[window_id.value];
 });
 
 const dialog_open = ref(true);
 const dialog_title = ref('Dialog Title');
+
+const dialog_confirm = ref(() => { });
+
+const window_name = "";
+
+function create_new_window_dialog() {
+  dialog_open.value = true;
+  dialog_title.value = "创建窗口";
+  dialog_confirm.value = create_new_window;
+}
+
+function create_new_window() {
+  windows.value.push({ id: windows.value.length, name: window_name, panels: [] });
+}
+
+function open_window_from_config_dialog() {
+
+}
+
+function save_window_dialog() {
+  dialog_open.value = true;
+  dialog_title.value = "保存当前窗口布局？"
+}
+
+function restore_window_dialog() {
+
+}
+
+const create_window_dropdown_open = ref(false);
+
+const current_panel_id = ref(0);
+
+function change_current_panel(id: number) {
+  current_panel_id.value = id;
+}
+
 </script>
 
 <template>
-  <LiteDialog v-model:is-open="dialog_open" v-model:title="dialog_title" @confirm="1"></LiteDialog>
+  <LiteDialog v-model:is-open="dialog_open" v-model:title="dialog_title" @confirm="dialog_confirm">
+
+  </LiteDialog>
   <header class="bg-desert-background text-desert-text dark:bg-aurora-background dark:text-aurora-text p-4 flex justify-between items-center
     border-b border-desert dark:border-aurora">
     <h1 class="text-xl font-bold">{{ current_window.name }}</h1>
     <div class="flex items-center">
-      <button class="mr-2 w-8 text-xl">
-        ➕
-      </button>
-      <button class="mr-2 w-8 text-xl">
+      <div class="relative">
+        <button class="mr-2 w-8 text-xl" @click="create_window_dropdown_open = !create_window_dropdown_open">
+          ➕
+        </button>
+        <ul v-if="create_window_dropdown_open"
+          class="text-sm absolute bg-desert text-desert-textlight dark:bg-aurora dark:text-aurora-textdark mt-2 rounded shadow-lg w-32 -left-10">
+          <li @click="create_new_window_dialog"
+            class="p-2 cursor-pointer text-center rounded border border-transparent hover:bg-desert-highlight dark:hover:bg-aurora-highlight hover:border-desert-background dark:hover:border-aurora-background">
+            创建新窗口</li>
+          <li @click="open_window_from_config_dialog"
+            class="p-2 cursor-pointer text-center rounded border border-transparent hover:bg-desert-highlight dark:hover:bg-aurora-highlight hover:border-desert-background dark:hover:border-aurora-background">
+            从配置文件打开</li>
+        </ul>
+      </div>
+      <button class="mr-2 w-8 text-xl" @click="save_window_dialog">
         💾
       </button>
-      <button class="mr-2 w-8 text-xl">
+      <button class="mr-2 w-8 text-xl" @click="restore_window_dialog">
         🔄
       </button>
-      <button @click="toggle_dark_mode" class="mr-3 w-8 text-xl">
+      <button class="mr-3 w-8 text-xl" @click="toggle_dark_mode">
         {{ dark_mode ? '✨' : '🔆' }}
       </button>
       <div class="relative">
-        <button @click="toggle_dropdown"
-          class="bg-desert text-desert-textlight dark:bg-aurora dark:text-aurora-textdark p-2 rounded w-32 text-center border border-transparent dark:hover:border-aurora-background">
+        <button @click="window_select_dropdown_open = !window_select_dropdown_open"
+          class="bg-desert text-desert-text dark:bg-aurora dark:text-aurora-textdark p-2 rounded w-32 text-center border border-transparent dark:hover:border-aurora-background">
           {{ current_window.name }}
         </button>
-        <ul v-if="dropdown_open"
-          class="absolute bg-desert text-desert-textlight dark:bg-aurora dark:text-aurora-textdark mt-2 rounded shadow-lg w-32">
-          <li v-for="{ id, name } of windows" :key="id" @click="change_window(id); dropdown_open = false"
-            class="p-2 hover:bg-desert-highlight cursor-pointer border border-transparent dark:hover:bg-aurora dark:hover:border-aurora-background text-center">
+        <ul v-if="window_select_dropdown_open"
+          class="absolute bg-desert text-desert-text dark:bg-aurora dark:text-aurora-textdark mt-2 rounded shadow-lg w-32">
+          <li v-for="{ id, name } of windows" :key="id" @click="change_window(id); window_select_dropdown_open = false"
+            class="p-2 hover:bg-desert-highlight dark:hover:bg-aurora-highlight hover:border-desert-background dark:hover:border-aurora-background cursor-pointer border border-transparent text-center rounded">
             {{ name }}
           </li>
         </ul>
@@ -117,5 +157,3 @@ const dialog_title = ref('Dialog Title');
     <p class="absolute right-4 bottom-2">🄯 shioko-chan XMU RCS 2025</p>
   </footer>
 </template>
-
-<style scoped></style>
