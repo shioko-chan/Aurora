@@ -4,14 +4,15 @@ import { computed, ref } from 'vue';
 
 import ResizingPanel from './components/ResizingPanel.vue';
 import LiteDialog from './components/LiteDialog.vue';
+import VideoStream from './components/VideoStream.vue';
 
 const windows = ref([{
   id: 0,
   name: 'QuasarTraj',
   panels: [
     { id: 0, title: '视频流-原图', x: 100, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
-    { id: 1, title: '视频流-检测框', x: 400, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
-    { id: 2, title: '参数-相机参数', x: 100, y: 400, width: 300, height: 200 },
+    // { id: 1, title: '视频流-检测框', x: 400, y: 100, width: 300, height: 200, type: 'video_stream', config: { url: 'http://localhost:8080' } },
+    // { id: 2, title: '参数-相机参数', x: 100, y: 400, width: 300, height: 200 },
   ]
 }, {
   id: 1,
@@ -57,7 +58,7 @@ const dialog_title = ref('Dialog Title');
 
 const dialog_confirm = ref(() => { });
 
-const window_name = "";
+const new_window_name = "";
 
 function create_new_window_dialog() {
   dialog_open.value = true;
@@ -66,7 +67,7 @@ function create_new_window_dialog() {
 }
 
 function create_new_window() {
-  windows.value.push({ id: windows.value.length, name: window_name, panels: [] });
+  windows.value.push({ id: windows.value.length, name: new_window_name, panels: [] });
 }
 
 function open_window_from_config_dialog() {
@@ -79,7 +80,8 @@ function save_window_dialog() {
 }
 
 function restore_window_dialog() {
-
+  dialog_open.value = true;
+  dialog_title.value = "是否重置窗口布局？"
 }
 
 const create_window_dropdown_open = ref(false);
@@ -94,9 +96,13 @@ function change_current_panel(id: number) {
 
 <template>
   <LiteDialog v-model:is-open="dialog_open" v-model:title="dialog_title" @confirm="dialog_confirm">
-
+    <div v-bind:hidden="true">
+      <label for="input_box">新窗口标题: </label>
+      <input id="input_box" type="text" v-model="new_window_name"
+        class="w-60 border-b-2 border-desert dark:border-aurora" />
+    </div>
   </LiteDialog>
-  <header class="bg-desert-background text-desert-text dark:bg-aurora-background dark:text-aurora-text p-4 flex justify-between items-center
+  <header class="z-40 bg-desert-background text-desert-text dark:bg-aurora-background dark:text-aurora-text p-4 flex justify-between items-center
     border-b border-desert dark:border-aurora">
     <h1 class="text-xl font-bold">{{ current_window.name }}</h1>
     <div class="flex items-center">
@@ -141,14 +147,15 @@ function change_current_panel(id: number) {
 
   <main
     class="bg-desert-background text-desert-text dark:bg-aurora-background dark:text-aurora-text p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow">
-    <ResizingPanel v-for="panel of current_window.panels" :key="panel.id" v-model:x="panel.x" v-model:y="panel.y"
-      v-model:width="panel.width" v-model:height="panel.height"
+    <ResizingPanel v-for="panel of current_window.panels" :key="panel.id" @prime="change_current_panel(panel.id)"
+      v-model:x="panel.x" v-model:y="panel.y" v-model:width="panel.width" v-model:height="panel.height"
+      :class="[panel.id === current_panel_id ? 'z-30' : 'z-0']"
       class="bg-desert-background p-0.5 rounded border border-desert dark:bg-aurora-background dark:border-aurora">
       <template #title>
-        <h2 class="text-lg font-bold mb-2 border-b border-desert dark:border-aurora pl-4">{{ panel.title }}</h2>
+        <h2 class="text-lg font-bold mb-0.5 border-b border-desert dark:border-aurora pl-4">{{ panel.title }}</h2>
       </template>
       <template #content>
-        <p>Content goes here...</p>
+        <VideoStream></VideoStream>
       </template>
     </ResizingPanel>
   </main>
