@@ -85,52 +85,32 @@ const stop_resize = () => {
 </script>
 
 <template>
-  <div
-    :class="{ 'select-none': dragging || resizing }"
-    class="absolute overflow-hidden flex flex-col items-stretch"
+  <div :class="{ 'select-none': dragging || resizing }" class="absolute overflow-hidden flex flex-col items-stretch"
     :style="{
       width: panel_width + 'px',
       height: panel_height + 'px',
       top: panel_top + 'px',
       left: panel_left + 'px',
-    }"
-    ref="panel"
-  >
+    }" ref="panel">
     <div @mousedown="start_drag" class="cursor-move bg-transparent h-fit">
       <slot name="title"></slot>
     </div>
-    <div
-      class="absolute top-0 right-0 h-full w-2 cursor-e-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'r')"
-    ></div>
-    <div
-      class="absolute bottom-0 left-0 w-full h-2 cursor-s-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'b')"
-    ></div>
-    <div
-      class="absolute top-0 left-0 h-full w-2 cursor-w-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'l')"
-    ></div>
-    <div
-      class="absolute top-0 left-0 w-full h-2 cursor-n-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 't')"
-    ></div>
-    <div
-      class="z-10 absolute top-0 left-0 h-2 w-2 cursor-nw-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'tl')"
-    ></div>
-    <div
-      class="z-10 absolute top-0 right-0 h-2 w-2 cursor-ne-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'tr')"
-    ></div>
-    <div
-      class="z-10 absolute bottom-0 left-0 h-2 w-2 cursor-sw-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'bl')"
-    ></div>
-    <div
-      class="z-10 absolute bottom-0 right-0 h-2 w-2 cursor-se-resize bg-transparent"
-      @mousedown.stop="(e) => start_resize(e, 'br')"
-    ></div>
+    <div class="absolute top-0 right-0 h-full w-2 cursor-e-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'r')"></div>
+    <div class="absolute bottom-0 left-0 w-full h-2 cursor-s-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'b')"></div>
+    <div class="absolute top-0 left-0 h-full w-2 cursor-w-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'l')"></div>
+    <div class="absolute top-0 left-0 w-full h-2 cursor-n-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 't')"></div>
+    <div class="z-10 absolute top-0 left-0 h-2 w-2 cursor-nw-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'tl')"></div>
+    <div class="z-10 absolute top-0 right-0 h-2 w-2 cursor-ne-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'tr')"></div>
+    <div class="z-10 absolute bottom-0 left-0 h-2 w-2 cursor-sw-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'bl')"></div>
+    <div class="z-10 absolute bottom-0 right-0 h-2 w-2 cursor-se-resize bg-transparent"
+      @mousedown.stop="(e) => start_resize(e, 'br')"></div>
     <div class="grow overflow-hidden">
       <slot name="content"></slot>
     </div>

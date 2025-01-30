@@ -1,12 +1,5 @@
-<template>
-  <canvas
-    class="w-full h-full bg-desert-background dark:bg-aurora-background object-fill"
-    ref="canvas"
-  ></canvas>
-</template>
-
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, useTemplateRef } from 'vue'
+import { onMounted, onBeforeUnmount, useTemplateRef, ref } from 'vue'
 
 const wsUrl = 'ws://localhost:8080'
 
@@ -33,6 +26,7 @@ function initializeWebSocket() {
 
   websocket.onopen = () => {
     console.log('视频流已建立连接')
+    not_streaming.value = false
   }
 
   websocket.onmessage = async (event) => {
@@ -43,15 +37,18 @@ function initializeWebSocket() {
     const image = await createImageBitmap(blob)
     ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
     ctx.drawImage(image, 0, 0, canvas.value.width, canvas.value.height)
+    not_streaming.value = false
   }
 
   websocket.onerror = (error) => {
     console.error('websocket出错，错误内容:', error)
+    not_streaming.value = true
     scheduleReconnect()
   }
 
   websocket.onclose = () => {
     console.log('视频流websocket已关闭，尝试重连...')
+    not_streaming.value = true
     scheduleReconnect()
   }
 }
@@ -82,4 +79,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   closeWebSocket()
 })
+
+const not_streaming = ref(false)
 </script>
+
+<template>
+  <div v-if="not_streaming"
+    class="w-full h-full bg-desert-background dark:bg-aurora-background flex justify-center items-center">
+    <p class="text-xl text-center font-bold text-desert-text dark:text-aurora-text">⚠️视频流加载失败，请检查目标机ip是否输入正确⚠️</p>
+  </div>
+  <canvas v-else class="w-full h-full bg-desert-background dark:bg-aurora-background object-fill" ref="canvas"></canvas>
+</template>
